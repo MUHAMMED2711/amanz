@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMANZ | Admin Login</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        :root {
+            /* Light Theme */
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-dim: #64748b;
+            --primary:#cd1c18;
+            --primary-hover: #cd1c18;
+            --border: #e2e8f0;
+            --input-bg: #f8fafc;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --primary:#cd1c18;
+            --primary-hover: #cd1c18;
+            --border: #334155;
+            --input-bg: #0f172a;
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -10px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+   .admin-nav{
+    width: 100%;
+    padding: 15px 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    /* Glass Effect */
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+
+    position: sticky;
+    top: 0;
+    z-index: 1000; 
+}
+/* ===== ADMIN NAVBAR ===== */
+
+.admin-nav{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 15px 40px;
+
+    /* Glass Effect */
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+
+    z-index: 1000;
+}
+.logo-section{
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 25px;
+}
+
+.logo-section img{
+    width: 120px;
+    height: auto;
+}
+
+.login-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.logo-box{
+    width: 440px;
+    height: 95px;
+    background: #fff;
+    border-radius: 20px;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin: 0 auto 10px;
+}
+
+.logo-box img{
+    width: 180px;
+    height: auto;
+    object-fit: contain;
+}
+        .brand {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .brand h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--text-main);
+        }
+
+        .brand span {
+            color: var(--primary);
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 440px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 3rem 2.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .icon-shield {
+            width: 64px;
+            height: 64px;
+            background: rgba(225, 91, 18, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: var(--primary);
+            font-size: 1.5rem;
+            border: 1px solid rgba(225, 91, 18, 0.2);
+        }
+
+        .login-card h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            color: var(--text-main);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+
+        .input-control {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--input-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .input-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(225, 91, 18, 0.1);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .toggle-password:hover {
+            color: var(--text-main);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-login:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .error-msg {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .back-to-site {
+            margin-top: 2rem;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .back-to-site:hover {
+            color: var(--primary);
+        }
+
+        /* Theme Toggle FAB */
+        .theme-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(15deg) scale(1.1);
+        }
+    </style>
+</head>
+<body>
+ <div class="logo-box">
+    <img src="WhatsApp_Image_2026-06-21_at_8.37.35_AM-removebg-preview.png" alt="AMANZ Logo">
+</div>
+    <div class="login-card">
+        <div class="icon-shield">
+            <i class="fas fa-shield-alt"></i> 
+        </div>
+        <h2>Admin Access</h2>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <input type="text" id="username" class="input-control" placeholder="Username or Email" required>
+            </div>
+            <!-- Main Wrapper -->
+<div class="flex flex-col md:flex-row min-h-screen w-full overflow-x-hidden">
+  
+  <!-- Sidebar -->
+  <aside class="w-full md:w-64 bg-white">
+    <!-- Sidebar contents -->
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 p-4 w-full">
+    <!-- Dashboard Overview contents -->
+  </main>
+
+</div>
+
+            <div class="form-group">
+                <div class="password-wrapper">
+                    <input type="password" id="password" class="input-control" placeholder="Password" required>
+                    <i class="far fa-eye toggle-password" id="togglePassword"></i>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login">Login</button>
+
+            <div id="errorMsg" class="error-msg">Invalid credentials. Please try again.</div>
+        </form>
+    </div>
+
+    <a href="index.html" class="back-to-site">
+        <i class="fas fa-arrow-left"></i> Back to main site
+    </a>
+
+    <button class="theme-toggle" id="themeToggle" title="Toggle Dark/Light Mode">
+        <i class="fas fa-sun"></i>
+    </button>
+
+    <script>
+        // Theme Management
+        const themeToggle = document.getElementById('themeToggle');
+        const root = document.documentElement;
+        const icon = themeToggle.querySelector('i');
+
+        const savedTheme = localStorage.getItem('amanz_theme') || 'light';
+        root.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = root.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            root.setAttribute('data-theme', newTheme);
+            localStorage.setItem('amanz_theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+
+        function updateThemeIcon(theme) {
+            icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+
+        // Toggle Password Visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        // GSAP Animations
+        gsap.from(".brand", { duration: 1, y: -20, opacity: 0, ease: "power3.out" });
+        gsap.from(".login-card", { duration: 1, y: 30, opacity: 0, delay: 0.2, ease: "power3.out" });
+        gsap.from(".back-to-site", { duration: 1, opacity: 0, delay: 0.5 });
+
+        // Login Logic
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            // Using the existing credentials
+            if (user === 'admin' && pass === 'amanz@2026') {
+                localStorage.setItem('amanz_admin_auth', 'true');
+                localStorage.setItem('amanz_admin_user', user);
+                
+                gsap.to("body", {
+                    duration: 0.5,
+                    opacity: 0,
+                    ease: "power2.in",
+                    onComplete: () => {
+                        window.location.href = 'admin.html';
+                    }
+                });
+            } else {
+                errorMsg.style.display = 'block';
+                gsap.fromTo(".login-card", 
+                    { x: -10 }, 
+                    { x: 0, duration: 0.1, repeat: 5, yoyo: true }
+                );
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Your Order | AMANZ</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.0.45/dist/lenis.min.js"></script>
+
+    <link rel="stylesheet" href="style9.css">
+    <style>
+        .tracking-section {
+            padding: 140px 5% 80px;
+            min-height: 80vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        .tracking-card {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .tracking-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .tracking-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+
+        .tracking-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .tracking-input {
+            flex: 1;
+            padding: 15px 25px;
+            border: 1px solid #eee;
+            border-radius: 50px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .tracking-input:focus {
+            border-color: #cd1c18;
+            box-shadow: 0 5px 15px rgba(205, 28, 24, 0.1);
+        }
+
+        .track-btn {
+            background: #cd1c18;
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .track-btn:hover {
+            background: #a11613;
+            transform: translateY(-2px);
+        }
+
+        /* Order Info Results */
+        .order-info-result {
+            display: none;
+            border-top: 1px solid #eee;
+            padding-top: 30px;
+            margin-top: 20px;
+        }
+
+        .status-tracker {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px 0;
+            position: relative;
+        }
+
+        .status-tracker::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 10%;
+            width: 80%;
+            height: 2px;
+            background: #eee;
+            z-index: 1;
+        }
+
+        .status-dot {
+            width: 30px;
+            height: 30px;
+            background: #eee;
+            border-radius: 50%;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .status-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .status-step.active .status-dot {
+            background: #cd1c18;
+            box-shadow: 0 0 15px rgba(205, 28, 24, 0.4);
+        }
+
+        .status-step.completed .status-dot {
+            background: #25D366;
+        }
+
+        .status-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #888;
+        }
+
+        .status-step.active .status-label {
+            color: #cd1c18;
+        }
+
+        .order-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            background: #fcfcfc;
+            padding: 20px;
+            border-radius: 16px;
+        }
+
+        .detail-item p:first-child {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #888;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        .detail-item p:last-child {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .error-msg {
+            color: #cd1c18;
+            text-align: center;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="scrolled">
+        <nav>
+            <a href="index9.html" class="logo">AMANZ</a>
+            <ul class="nav-links">
+                <li><a href="index9.html#home">Home</a></li>
+                <li><a href="index9.html#arrivals">Collections</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="tracking-section">
+            <div class="tracking-card">
+                <div class="tracking-header">
+                    <h1>Track Order</h1>
+                    <p>Enter your tracking ID to see your order status.</p>
+                </div>
+
+                <div class="tracking-input-group">
+                    <input type="text" id="trackingIdInput" class="tracking-input" placeholder="e.g. AMZ-XXXXXX">
+                    <button id="trackBtn" class="track-btn">Track</button>
+                </div>
+                <p id="errorMsg" class="error-msg">Order ID not found. Please check and try again.</p>
+
+                <div id="resultBox" class="order-info-result">
+                    <div class="status-tracker">
+                        <div class="status-step" id="step-Pending">
+                            <div class="status-dot"><i class="fas fa-clock"></i></div>
+                            <span class="status-label">Pending</span>
+                        </div>
+                        <div class="status-step" id="step-Shipped">
+                            <div class="status-dot"><i class="fas fa-truck"></i></div>
+                            <span class="status-label">Shipped</span>
+                        </div>
+                        <div class="status-step" id="step-Delivered">
+                            <div class="status-dot"><i class="fas fa-check"></i></div>
+                            <span class="status-label">Delivered</span>
+                        </div>
+                    </div>
+
+                    <div class="order-details-grid">
+                        <div class="detail-item">
+                            <p>Status</p>
+                            <p id="resStatus" style="color:#cd1c18">Pending</p>
+                        </div>
+                        <div class="detail-item">
+                            <p>Customer</p>
+                            <p id="resName">John Doe</p>
+                        </div>
+                        <div class="detail-item">
+                            <p>Product</p>
+                            <p id="resProduct">Luxury Fragrance</p>
+                        </div>
+                        <div class="detail-item">
+                            <p>Amount</p>
+                            <p id="resTotal">₹699</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px; text-align: center;">
+                        <p style="font-size: 0.85rem; color: #666;">Need help? <a href="https://wa.me/917907731688" style="color: #25D366; font-weight: 600;">Chat on WhatsApp</a></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer style="padding: 60px 10% 30px;">
+        <div class="footer-bottom" style="border: none;">
+            <p>&copy; 2026 AMANZ Fragrance. Order Tracking System.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const trackBtn = document.getElementById('trackBtn');
+            const input = document.getElementById('trackingIdInput');
+            const resultBox = document.getElementById('resultBox');
+            const errorMsg = document.getElementById('errorMsg');
+
+            trackBtn.addEventListener('click', trackOrder);
+            input.addEventListener('keypress', (e) => { if(e.key === 'Enter') trackOrder(); });
+
+            function trackOrder() {
+                const id = input.value.trim().toUpperCase();
+                if (!id) return;
+
+                const orders = JSON.parse(localStorage.getItem('amanz_orders') || '[]');
+                const order = orders.find(o => o.id === id);
+
+                if (order) {
+                    errorMsg.style.display = 'none';
+                    resultBox.style.display = 'block';
+                    
+                    // Populate data
+                    document.getElementById('resStatus').innerText = order.status;
+                    document.getElementById('resName').innerText = order.customerName;
+                    document.getElementById('resProduct').innerText = order.productName + ' (x' + order.quantity + ')';
+                    document.getElementById('resTotal').innerText = '₹' + order.total;
+
+                    // Update tracker UI
+                    document.querySelectorAll('.status-step').forEach(s => s.classList.remove('active', 'completed'));
+                    
+                    if (order.status === 'Pending') {
+                        document.getElementById('step-Pending').classList.add('active');
+                    } else if (order.status === 'Shipped') {
+                        document.getElementById('step-Pending').classList.add('completed');
+                        document.getElementById('step-Shipped').classList.add('active');
+                    } else if (order.status === 'Delivered') {
+                        document.getElementById('step-Pending').classList.add('completed');
+                        document.getElementById('step-Shipped').classList.add('completed');
+                        document.getElementById('step-Delivered').classList.add('active', 'completed');
+                    }
+
+                    gsap.from('#resultBox', { opacity: 0, y: 20, duration: 0.5 });
+                } else {
+                    resultBox.style.display = 'none';
+                    errorMsg.style.display = 'block';
+                }
+            }
+
+            // Auto-track if ID in URL
+            const params = new URLSearchParams(window.location.search);
+            const urlId = params.get('id');
+            if (urlId) {
+                input.value = urlId;
+                trackOrder();
+            }
+        });
+
+        const lenis = new Lenis();
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+    </script>
+</body>
+</html>

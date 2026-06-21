@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMANZ | Admin Dashboard</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            /* Light Theme */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-sidebar: #ffffff;
+            --text-main: #0f172a;
+            --text-dim: #64748b;
+            --primary: #cd1c18;
+            --primary-light: rgba(205, 28, 24, 0.1);
+            --border: #e2e8f0;
+            --sidebar-width: 260px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --transition: all 0.2s ease;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-sidebar: #1e293b;
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+            --primary: #cd1c18;
+            --primary-light: rgba(205, 28, 24, 0.15);
+            --border: #334155;
+            --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+        }
+
+        /* Initial Auth Check Style */
+        body { opacity: 0; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+        }
+
+        .sidebar-brand {
+            padding: 0.5rem 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-brand img {
+            max-height: 50px;
+            width: auto;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        /* MAIN CONTENT */
+        .main-container {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .topbar {
+            height: 70px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 900;
+        }
+
+        .btn-theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            color: var(--text-dim);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .user-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .content-body {
+            padding: 2rem;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 1rem;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-warning { background: #fef9c3; color: #854d0e; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+
+        .btn-action {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-action:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        /* MODAL */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 1rem;
+        }
+
+        .modal.open { display: flex; }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .image-upload-preview {
+            width: 100%;
+            height: 180px;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            background: var(--bg-body);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .image-upload-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-upload-preview .hover-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .image-upload-preview:hover .hover-overlay { display: flex; }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-body);
+            color: var(--text-main);
+            outline: none;
+            margin-bottom: 1rem;
+            font-family: inherit;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dim);
+        }
+
+        .section-box { display: none; }
+        .section-box.active { display: block; }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img src="WhatsApp Image 2026-06-21 at 8.37.35 AM.jpeg" alt="AMANZ">
+        </div>
+        <nav class="nav-menu">
+            <a href="#" class="nav-link active" onclick="showSection('dashboard', this)"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="#" class="nav-link" onclick="showSection('products', this)"><i class="fas fa-spray-can"></i> Products</a>
+            <a href="#" class="nav-link" onclick="showSection('orders', this)"><i class="fas fa-shopping-cart"></i> Orders</a>
+            <a href="#" class="nav-link" onclick="showSection('inquiries', this)"><i class="fas fa-comment-alt"></i> Inquiries</a>
+            <a href="#" class="nav-link" onclick="showSection('access', this)"><i class="fas fa-user-shield"></i> Access</a>
+            <a href="#" class="nav-link" onclick="showSection('settings', this)"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="nav-link" style="color: #ef4444;"><i class="fas fa-power-off"></i> Logout</a>
+        </div>
+    </aside>
+
+    <div class="main-container">
+        <header class="topbar">
+            <h2 id="section-title">Dashboard Overview</h2>
+            <div class="topbar-right">
+                <button class="btn-theme-toggle" id="themeToggle" title="Toggle Theme"><i class="fas fa-moon"></i></button>
+                <div class="user-dropdown">
+                    <img src="" style="width: 28px; height: auto; margin-right: 5px;">
+                    <div style="font-weight: 600; font-size: 0.85rem;">Super Admin</div>
+                </div>
+            </div>
+        </header>
+
+        <main class="content-body">
+            <div id="dashboard" class="section-box active">
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-indian-rupee-sign"></i></div><div class="stat-label">Total Revenue</div><div class="stat-value" id="stat-revenue">₹0</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-shopping-bag"></i></div><div class="stat-label">Orders (Conf/Total)</div><div class="stat-value" id="stat-orders">0 / 0</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-ban"></i></div><div class="stat-label">Canceled Orders</div><div class="stat-value" id="stat-canceled">0</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-eye"></i></div><div class="stat-label">Store Visits</div><div class="stat-value" id="stat-visits">0</div></div>
+                </div>
+                
+                <!-- Sales Sources -->
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="font-weight: 600; margin-bottom: 1rem;">Sales Sources</h3>
+                    <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
+                        <div class="stat-card" style="padding: 1rem;">
+                            <div class="stat-label">Website</div>
+                            <div class="stat-value" id="source-website" style="font-size: 1.2rem;">0</div>
+                        </div>
+                        <div class="stat-card" style="padding: 1rem;">
+                            <div class="stat-label">Google</div>
+                            <div class="stat-value" id="source-google" style="font-size: 1.2rem;">0</div>
+                        </div>
+                        <div class="stat-card" style="padding: 1rem;">
+                            <div class="stat-label">Direct</div>
+                            <div class="stat-value" id="source-direct" style="font-size: 1.2rem;">0</div>
+                        </div>
+                        <div class="stat-card" style="padding: 1rem;">
+                            <div class="stat-label">Unknown</div>
+                            <div class="stat-value" id="source-unknown" style="font-size: 1.2rem;">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5rem;">
+                    <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border);"><canvas id="revenueChart" height="280"></canvas></div>
+                    <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border);">
+                        <h4 style="margin-bottom:1rem; font-weight:600;">Recent Activation History</h4>
+                        <div id="activity-log" style="font-size: 0.85rem; max-height: 250px; overflow-y: auto;">
+                            <!-- Activity will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="products" class="section-box">
+                <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 2rem; align-items: center;">
+                        <h3 style="font-weight: 600;">Inventory List</h3>
+                        <button class="btn-primary" onclick="openProductModal('add')">+ Add Product</button>
+                    </div>
+                    <table>
+                        <thead><tr><th>ID</th><th>Product</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="productTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- OTHER SECTIONS PLACEHOLDERS -->
+            <div id="orders" class="section-box">
+                <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 2rem; align-items: center;">
+                        <h3 style="font-weight: 600;">Customer Orders</h3>
+                        <div style="display:flex; gap:10px;">
+                             <button class="btn-action" onclick="loadOrders()" title="Refresh Orders"><i class="fas fa-sync"></i></button>
+                        </div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Product</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderTableBody">
+                                <!-- Orders will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="inquiries" class="section-box">
+                <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+                    <h3 style="font-weight: 600; margin-bottom: 1.5rem;">Customer Inquiries</h3>
+                    <div style="text-align:center; padding: 40px; color: var(--text-dim);">Coming Soon</div>
+                </div>
+            </div>
+
+            <div id="access" class="section-box">
+                <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 2rem; align-items: center;">
+                        <div>
+                            <h3 style="font-weight: 600;">Service Access & Permissions</h3>
+                            <p style="font-size: 0.8rem; color: var(--text-dim);">Manage team members and their access levels.</p>
+                        </div>
+                        <button class="btn-primary" onclick="openUserModal('add')">+ Add User</button>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead><tr><th>User</th><th>Role</th><th>Last Login</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody id="userTableBody">
+                                <!-- Users will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="settings" class="section-box">
+                <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+                    <h3 style="font-weight: 600; margin-bottom: 2rem;">System Settings</h3>
+                    <div style="max-width: 600px;">
+                        <label class="form-label">Store Name</label>
+                        <input type="text" class="form-input" value="AMANZ Fragrance">
+                        
+                        <label class="form-label">Support Email</label>
+                        <input type="email" class="form-input" value="contact@amanzfragrance.com">
+                        
+                        <label class="form-label">Currency</label>
+                        <select class="form-input">
+                            <option selected>INR (₹)</option>
+                            <option>USD ($)</option>
+                        </select>
+
+                        <div style="margin-top: 2rem;">
+                            <button class="btn-primary">Save Settings</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Add Product</h3>
+                <button class="btn-close" onclick="closeProductModal()">&times;</button>
+            </div>
+            <form id="productForm">
+                <input type="hidden" id="editProductId">
+                <label class="form-label">Product Image</label>
+                <div class="image-upload-preview" onclick="document.getElementById('prodImageInput').click()">
+                    <i class="fas fa-camera" id="previewIcon" style="font-size: 2rem; color: var(--text-dim);"></i>
+                    <img id="imagePreview" src="" style="display: none;">
+                    <div class="hover-overlay">Click to Upload</div>
+                </div>
+                <input type="file" id="prodImageInput" accept="image/*" style="display:none;" onchange="previewImage(this)">
+                
+                <label class="form-label">Product Name</label>
+                <input type="text" id="prodName" class="form-input" required>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div><label class="form-label">Price</label><input type="number" id="prodPrice" class="form-input" required></div>
+                    <div><label class="form-label">Stock</label><input type="number" id="prodStock" class="form-input" required></div>
+                </div>
+
+                <label class="form-label">Status</label>
+                <select id="prodStatus" class="form-input">
+                    <option value="In Stock">In Stock</option>
+                    <option value="Low Stock">Low Stock</option>
+                    <option value="Out of Stock">Out of Stock</option>
+                </select>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button type="button" onclick="closeProductModal()" style="flex:1; padding: 0.75rem; border: 1px solid var(--border); background:none; border-radius:10px; cursor:pointer;">Cancel</button>
+                    <button type="submit" class="btn-primary" style="flex:2">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- USER MODAL -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="userModalTitle">Manage User</h3>
+                <button onclick="closeUserModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+            <form id="userForm">
+                <input type="hidden" id="editUserId">
+                <label class="form-label">Full Name</label>
+                <input type="text" id="userName" class="form-input" required>
+                
+                <label class="form-label">Email Address</label>
+                <input type="email" id="userEmail" class="form-input" required>
+                
+                <label class="form-label">Role</label>
+                <select id="userRole" class="form-input">
+                    <option value="Super Admin">Super Admin</option>
+                    <option value="Manager">Manager</option>
+                    <option value="Editor">Editor</option>
+                </select>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button type="button" onclick="closeUserModal()" style="flex:1; padding: 0.75rem; border: 1px solid var(--border); background:none; border-radius:10px; cursor:pointer;">Cancel</button>
+                    <button type="submit" class="btn-primary" style="flex:2">Save User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Init state
+        if (localStorage.getItem('amanz_admin_auth') !== 'true') window.location.href = 'admin-login.html';
+        document.body.style.opacity = '1';
+
+        function showSection(id, el) {
+            // Protected Sections check
+            if (id === 'access' || id === 'settings') {
+                const pass = prompt("Enter Administration Password to access this section:");
+                if (pass !== 'admin123') { // Default manager password
+                    alert("Unauthorized access attempt blocked.");
+                    logActivity(`Unauthorized access attempt to ${id}`);
+                    return;
+                }
+            }
+
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            el.classList.add('active');
+            document.querySelectorAll('.section-box').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('section-title').innerText = id.charAt(0).toUpperCase() + id.slice(1);
+        }
+
+        function logout() { localStorage.removeItem('amanz_admin_auth'); window.location.href = 'admin-login.html'; }
+
+        // Theme
+        const root = document.documentElement;
+        document.getElementById('themeToggle').onclick = () => {
+            const theme = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            root.setAttribute('data-theme', theme);
+            localStorage.setItem('amanz_theme', theme);
+            updateCharts(theme);
+        };
+
+        // Charts
+        let revChart, scentChart;
+        function initCharts() {
+            const dark = root.getAttribute('data-theme') === 'dark';
+            const color = dark ? '#94a3b8' : '#64748b';
+            
+            revChart = new Chart(document.getElementById('revenueChart'), {
+                type: 'line',
+                data: { labels: ['M','T','W','T','F','S','S'], datasets: [{ data: [12,19,15,25,22,30,28], borderColor: '#cd1c18', tension: 0.4, fill: true, backgroundColor: 'rgba(205,28,24,0.1)' }] },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { ticks: { color: color } }, x: { ticks: { color: color } } } }
+            });
+            scentChart = new Chart(document.getElementById('scentChart'), {
+                type: 'doughnut',
+                data: { labels: ['Urban', 'Velvet', 'Woody'], datasets: [{ data: [45,30,25], backgroundColor: ['#cd1c18', '#64748b', '#94a3b8'], borderWidth: 0 }] },
+                options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: color } } } }
+            });
+        }
+        function updateCharts(t) {
+            const dark = t === 'dark';
+            const color = dark ? '#94a3b8' : '#64748b';
+            revChart.options.scales.y.ticks.color = color; revChart.options.scales.x.ticks.color = color; revChart.update();
+            scentChart.options.plugins.legend.labels.color = color; scentChart.update();
+        }
+
+        // Products
+        let products = [
+            { id: '#001', name: 'Urban Bloom', price: 699, stock: 1000, status: 'In Stock', img: 'image2.jpeg' },
+            { id: '#002', name: 'Velvet Noir', price: 699, stock: 1000, status: 'In Stock', img: 'image1.jpeg' },
+            { id: '#003', name: 'Woody amber', price: 699, stock: 1000, status: 'In Stock', img: 'image3.jpeg' },
+            { id: '#004', name: 'amber mistique', price: 699, stock: 1000, status: 'In Stock', img: 'amanz.2.3.jpeg'},
+            { id: '#005', name: 'sweet london', price: 699, stock: 1000, status: 'In Stock', img: 'amanz.com.jpeg' }
+
+        ];
+
+        function renderProducts() {
+            const body = document.getElementById('productTableBody');
+            body.innerHTML = '';
+            products.forEach(p => {
+                const badge = p.status === 'In Stock' ? 'badge-success' : 'badge-warning';
+                body.innerHTML += `<tr><td>${p.id}</td><td style="display:flex;align-items:center;gap:0.75rem"><img src="${p.img}" style="width:36px;height:36px;border-radius:8px;object-fit:cover">${p.name}</td><td>₹${p.price}</td><td>${p.stock}</td><td><span class="badge ${badge}">${p.status}</span></td><td><button class="btn-action" onclick="openProductModal('edit','${p.id}')"><i class="fas fa-edit"></i></button></td></tr>`;
+            });
+        }
+
+        function previewImage(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('imagePreview').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                    document.getElementById('previewIcon').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function openProductModal(mode, id = null) {
+            document.getElementById('productForm').reset();
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('previewIcon').style.display = 'block';
+            document.getElementById('editProductId').value = id || '';
+            if (mode === 'edit') {
+                const p = products.find(x => x.id === id);
+                if (p) {
+                    document.getElementById('modalTitle').innerText = 'Edit Product';
+                    document.getElementById('prodName').value = p.name;
+                    document.getElementById('prodPrice').value = p.price;
+                    document.getElementById('prodStock').value = p.stock;
+                    document.getElementById('prodStatus').value = p.status;
+                    if (p.img) { document.getElementById('imagePreview').src = p.img; document.getElementById('imagePreview').style.display = 'block'; document.getElementById('previewIcon').style.display = 'none'; }
+                }
+            } else { document.getElementById('modalTitle').innerText = 'Add Product'; }
+            document.getElementById('productModal').classList.add('open');
+        }
+
+        function closeProductModal() { document.getElementById('productModal').classList.remove('open'); }
+
+        document.getElementById('productForm').onsubmit = e => {
+            e.preventDefault();
+            const id = document.getElementById('editProductId').value;
+            const name = document.getElementById('prodName').value;
+            const price = document.getElementById('prodPrice').value;
+            const stock = document.getElementById('prodStock').value;
+            const status = document.getElementById('prodStatus').value;
+            const img = document.getElementById('imagePreview').src;
+
+            if (id) {
+                const idx = products.findIndex(x => x.id === id);
+                products[idx] = { ...products[idx], name, price, stock, status, img };
+            } else {
+                const newId = '#' + String(products.length + 1).padStart(3, '0');
+                products.push({ id: newId, name, price, stock, status, img: img || 'image1.jpeg' });
+            }
+            renderProducts(); closeProductModal();
+        };
+
+        // Orders Management
+        let customerOrders = [];
+
+        function loadOrders() {
+            customerOrders = JSON.parse(localStorage.getItem('amanz_orders') || '[]');
+            renderOrders();
+            updateDashboardStats();
+        }
+
+        function renderOrders() {
+            const body = document.getElementById('orderTableBody');
+            if (!body) return;
+            body.innerHTML = '';
+            
+            if (customerOrders.length === 0) {
+                body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 40px; color: var(--text-dim);">No orders found.</td></tr>';
+                return;
+            }
+
+            customerOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            customerOrders.forEach(o => {
+                let badgeClass = 'badge-warning';
+                if (o.status === 'Shipped') badgeClass = 'badge-info';
+                if (o.status === 'Delivered') badgeClass = 'badge-success';
+
+                body.innerHTML += `
+                    <tr>
+                        <td style="font-weight:600;">${o.id}</td>
+                        <td>
+                            <div style="font-weight:500;">${o.customerName}</div>
+                            <div style="font-size:0.75rem; color:var(--text-dim);">${o.customerPhone}</div>
+                        </td>
+                        <td>${o.productName} (x${o.quantity})</td>
+                        <td>₹${o.total}</td>
+                        <td><span class="badge ${badgeClass}">${o.status}</span></td>
+                        <td>
+                            <select onchange="updateOrderStatus('${o.id}', this.value)" style="padding:4px; border-radius:6px; border:1px solid var(--border); background:var(--bg-body); color:var(--text-main); font-size:0.8rem; cursor:pointer;">
+                                <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="Confirmed" ${o.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+                                <option value="Shipped" ${o.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                                <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                                <option value="Canceled" ${o.status === 'Canceled' ? 'selected' : ''}>Canceled</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            const idx = customerOrders.findIndex(o => o.id === orderId);
+            if (idx !== -1) {
+                const oldStatus = customerOrders[idx].status;
+                customerOrders[idx].status = newStatus;
+                localStorage.setItem('amanz_orders', JSON.stringify(customerOrders));
+                
+                logActivity(`Order ${orderId} status changed: ${oldStatus} -> ${newStatus}`);
+                renderOrders();
+                updateDashboardStats();
+            }
+        }
+
+        // Activity Logging
+        function logActivity(action) {
+            let logs = JSON.parse(localStorage.getItem('amanz_logs') || '[]');
+            const entry = {
+                action,
+                time: new Date().toISOString(),
+                user: 'Admin'
+            };
+            logs.unshift(entry);
+            if (logs.length > 50) logs.pop();
+            localStorage.setItem('amanz_logs', JSON.stringify(logs));
+            renderActivityLogs();
+        }
+
+        function renderActivityLogs() {
+            const container = document.getElementById('activity-log');
+            if (!container) return;
+            const logs = JSON.parse(localStorage.getItem('amanz_logs') || '[]');
+            
+            if (logs.length === 0) {
+                container.innerHTML = '<div style="color:var(--text-dim); text-align:center; padding:1rem;">No recent activity</div>';
+                return;
+            }
+
+            container.innerHTML = logs.map(log => `
+                <div style="padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 2px;">
+                    <div style="font-weight: 500; color: var(--text-main);">${log.action}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-dim);">
+                        <i class="far fa-clock"></i> ${new Date(log.time).toLocaleTimeString()} · By ${log.user}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateDashboardStats() {
+            const totalOrders = customerOrders.length;
+            const confirmedOrders = customerOrders.filter(o => o.status === 'Confirmed' || o.status === 'Shipped' || o.status === 'Delivered').length;
+            const canceledOrders = customerOrders.filter(o => o.status === 'Canceled').length;
+            const totalRevenue = customerOrders.filter(o => o.status !== 'Canceled').reduce((sum, o) => sum + o.total, 0);
+            
+            // Mock sources if not present (real app would track this on order creation)
+            const sources = {
+                website: customerOrders.filter(o => o.source === 'Website').length || 0,
+                google: customerOrders.filter(o => o.source === 'Google').length || 0,
+                direct: customerOrders.filter(o => o.source === 'Direct').length || 0,
+                unknown: customerOrders.filter(o => o.source === 'Unknown').length || 
+                         customerOrders.filter(o => !o.source).length
+            };
+
+            document.getElementById('stat-revenue').innerText = '₹' + totalRevenue.toLocaleString();
+            document.getElementById('stat-orders').innerText = `${confirmedOrders} / ${totalOrders}`;
+            document.getElementById('stat-canceled').innerText = canceledOrders;
+            document.getElementById('stat-visits').innerText = Math.floor(totalOrders * 5.4 + 42); // Mock placeholder
+
+            document.getElementById('source-website').innerText = sources.website;
+            document.getElementById('source-google').innerText = sources.google;
+            document.getElementById('source-direct').innerText = sources.direct;
+            document.getElementById('source-unknown').innerText = sources.unknown;
+        }
+
+        // User Management
+        let adminUsers = JSON.parse(localStorage.getItem('amanz_users') || '[{"id":"u1","name":"Super Admin","email":"admin@amanz.com","role":"Super Admin","lastLogin":"Today at 08:30","status":"Active"}]');
+
+        function renderUsers() {
+            const body = document.getElementById('userTableBody');
+            if (!body) return;
+            body.innerHTML = '';
+            adminUsers.forEach(u => {
+                body.innerHTML += `
+                    <tr>
+                        <td style="display:flex;align-items:center;gap:0.75rem">
+                            <div class="user-avatar" style="width:32px;height:32px">${u.name.substring(0,2).toUpperCase()}</div>
+                            <div>
+                                <div style="font-weight:600;">${u.name}</div>
+                                <div style="font-size:0.75rem; color:var(--text-dim);">${u.email}</div>
+                            </div>
+                        </td>
+                        <td>${u.role}</td>
+                        <td style="font-size:0.8rem;">${u.lastLogin}</td>
+                        <td><span class="badge ${u.status === 'Active' ? 'badge-success' : 'badge-warning'}">${u.status}</span></td>
+                        <td>
+                            <button class="btn-action" onclick="openUserModal('edit','${u.id}')"><i class="fas fa-edit"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openUserModal(mode, id = null) {
+            document.getElementById('userForm').reset();
+            document.getElementById('editUserId').value = id || '';
+            if (mode === 'edit') {
+                const u = adminUsers.find(x => x.id === id);
+                if (u) {
+                    document.getElementById('userModalTitle').innerText = 'Edit User';
+                    document.getElementById('userName').value = u.name;
+                    document.getElementById('userEmail').value = u.email;
+                    document.getElementById('userRole').value = u.role;
+                }
+            } else {
+                document.getElementById('userModalTitle').innerText = 'Add New user';
+            }
+            document.getElementById('userModal').classList.add('open');
+        }
+
+        function closeUserModal() { document.getElementById('userModal').classList.remove('open'); }
+
+        document.getElementById('userForm').onsubmit = e => {
+            e.preventDefault();
+            const id = document.getElementById('editUserId').value;
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            const role = document.getElementById('userRole').value;
+
+            if (id) {
+                const idx = adminUsers.findIndex(x => x.id === id);
+                adminUsers[idx] = { ...adminUsers[idx], name, email, role };
+                logActivity(`User ${name} updated`);
+            } else {
+                const newId = 'u' + Date.now();
+                adminUsers.push({ id: newId, name, email, role, lastLogin: 'Never', status: 'Active' });
+                logActivity(`New user added: ${name}`);
+            }
+            localStorage.setItem('amanz_users', JSON.stringify(adminUsers));
+            renderUsers(); closeUserModal();
+        };
+
+        window.onload = () => { 
+            initCharts(); 
+            renderProducts(); 
+            loadOrders();
+            renderActivityLogs();
+            renderUsers();
+            if (!localStorage.getItem('amanz_logs')) logActivity('Admin logged in');
+        };
+    </script>
+</body>
+</html>
